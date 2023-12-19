@@ -1,0 +1,79 @@
+                 How suppress name mangling of function in DLL
+
+I'm trying to create a DLL that exports a function called "GetName". I'd like other code to be able 
+to call this function without having to know the mangled function name.
+
+My header file looks like this:
+
+#ifdef __cplusplus
+#define EXPORT extern "C" __declspec (dllexport)
+#else
+#define EXPORT __declspec (dllexport)
+#endif
+
+EXPORT TCHAR * CALLBACK GetName();
+
+My code looks like this:
+
+#include <windows.h>
+#include "PluginOne.h"
+
+int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
+{
+     return TRUE ;
+}
+
+EXPORT TCHAR * CALLBACK GetName()
+{
+    return TEXT("Test Name");
+}
+
+When I build, the DLL still exports the function with the name: "_GetName@0".
+
+What am I doing wrong?
+
+
+
+Small correction - for success resolving name by clinet
+
+extern "C"
+
+must be as on export side as on import.
+
+extern "C" will reduce name of proc to: "_GetName".
+
+More over you can force any name with help of section EXPORTS in .def file
+
+
+
+the right answer is the following:
+
+extern "C" int MyFunc(int param);
+
+and
+
+int MyFunc(int param);
+
+is two declarations which uses different internal naming, first - is in C-style, second - in the C++ style.
+
+internal naming required for build tools to determine which arguments function receives, what type returns etc, 
+since C++ is more complicated (oop's, overloaded, virtual functions etc) - it uses more complicated naming. 
+calling convention also affects both c and c++ namings.
+
+both this styles of naming is applied when using __declspec(dllexport) in the same manner.
+
+if you want to omit name mangling of exported routine, add a module definition file to your project, type in 
+it (in this case you not required to declspec dllexport):
+
+LIBRARY mylib
+EXPORTS
+  MyFunc
+
+this will omit explicit name decoration (samples below).
+
+_MyFunc (c style, __cdecl)
+_MyFunc@4 (c style, __stdcall)
+?MyFunc@@YAHH@Z (c++ style, __cdecl)
+?MyFunc@@YGHH@Z (c++ style, __stdcall)
+
+
