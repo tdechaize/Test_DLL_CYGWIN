@@ -49,7 +49,7 @@ goto FIN
 :complink32
 echo. ******************            Compilation de la DLL en mode 32 bits        *******************
 set "PAR1=%~1"
-if PAR1 == "TWO" (
+if "%PAR1%" == "TWO" (
 REM     Options used by GCC compiler 32 bits of MingW64 included in CYGWIN64
 REM 		-c       					Option to impose compile only
 REM 		-Dxxxxx	 					Define variable xxxxxx used by precompiler
@@ -107,7 +107,7 @@ exit /B
 :complink64
 echo. ******************          Compilation de la DLL en mode 64 bits        *******************
 set "PAR1=%~1"
-if PAR1 == "TWO" (
+if "%PAR1%" == "TWO" (
 REM     Options used by GCC compiler 64 bits of MingW64 included in CYGWIN64
 REM 		-c       					Option to impose compile only
 REM 		-Dxxxxx	 					Define variable xxxxxx used by precompiler
